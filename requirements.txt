@@ -14,7 +14,7 @@ fsspec==2025.2.0
 gevent==24.11.1
 grpcio==1.70.0
 gunicorn==23.0.0
-idna==3.10
+idna==2.10
 itsdangerous==2.2.0
 Jinja2==3.1.5
 kiwisolver==1.4.8
