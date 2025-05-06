@@ -31,11 +31,12 @@ RUN python -m venv /opt/venv
 # Set working directory
 WORKDIR /app
 
-# Copy and install dependencies
+# Install Python dependencies
 COPY requirements.txt .
 RUN pip install --upgrade pip && \
-    pip install -r requirements.txt || (echo "---- Failed to install requirements ----" && cat requirements.txt && exit 1)
-
+    pip install --extra-index-url https://download.pytorch.org/whl/cpu torch torchaudio torchvision && \
+    pip install -r requirements.txt
+    
 # Copy the rest of the app
 COPY . .
 
