@@ -1,0 +1,8 @@
+[phases.setup]
+nixPkgs = ["libGL", "libGLU", "mesa"]
+
+[phases.install]
+cmds = ["pip install -r requirements.txt"]
+
+[start]
+cmd = "gunicorn app:app"
