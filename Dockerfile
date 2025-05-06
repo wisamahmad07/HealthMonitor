@@ -5,7 +5,8 @@ FROM python:3.10.12-slim
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
     PIP_NO_CACHE_DIR=1 \
-    PIP_DISABLE_PIP_VERSION_CHECK=1
+    PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    PATH="/opt/venv/bin:$PATH"
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -17,25 +18,33 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libxrender-dev \
     gcc \
     build-essential \
+    python3-dev \
+    libjpeg-dev \
+    zlib1g-dev \
+    libpng-dev \
+    libffi-dev \
     && rm -rf /var/lib/apt/lists/*
-
-# Create working directory
-WORKDIR /app
 
 # Create virtual environment
 RUN python -m venv /opt/venv
-ENV PATH="/opt/venv/bin:$PATH"
 
-# Install Python dependencies
+# Set working directory
+WORKDIR /app
+
+# Copy requirements and install
 COPY requirements.txt .
+
+# Install pip packages including PyTorch CPU versions
 RUN pip install --upgrade pip && \
+    pip install --extra-index-url https://download.pytorch.org/whl/cpu \
+    torch==2.2.2+cpu torchaudio==2.2.2+cpu torchvision==0.17.2+cpu && \
     pip install -r requirements.txt
 
 # Copy application files
 COPY . .
 
 # Expose port
-EXPOSE 8000
+EXPOSE 5000
 
-# Run Gunicorn using virtual environment
+# Run with Gunicorn
 CMD ["gunicorn", "--timeout", "6000", "--workers", "1", "--worker-class", "gevent", "--worker-connections", "100", "main:app"]
