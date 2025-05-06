@@ -5,7 +5,8 @@ FROM python:3.10.12-slim
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
     PIP_NO_CACHE_DIR=1 \
-    PIP_DISABLE_PIP_VERSION_CHECK=1
+    PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    PATH="/opt/venv/bin:$PATH"
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -17,25 +18,29 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libxrender-dev \
     gcc \
     build-essential \
+    python3-dev \
+    libjpeg-dev \
+    zlib1g-dev \
+    libpng-dev \
+    libffi-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Create working directory
+# Create and activate virtual environment
+RUN python -m venv /opt/venv
+
+# Set working directory
 WORKDIR /app
 
-# Create virtual environment
-RUN python -m venv /opt/venv
-ENV PATH="/opt/venv/bin:$PATH"
-
-# Install Python dependencies
+# Copy and install dependencies
 COPY requirements.txt .
 RUN pip install --upgrade pip && \
-    pip install -r requirements.txt
+    pip install -r requirements.txt || (echo "---- Failed to install requirements ----" && cat requirements.txt && exit 1)
 
-# Copy application files
+# Copy the rest of the app
 COPY . .
 
 # Expose port
 EXPOSE 5000
 
-# Run Gunicorn using virtual environment
+# Run application with Gunicorn
 CMD ["gunicorn", "--timeout", "6000", "--workers", "1", "--worker-class", "gevent", "--worker-connections", "100", "main:app"]
