@@ -36,8 +36,6 @@ COPY requirements.txt .
 
 # Install pip packages including PyTorch CPU versions
 RUN pip install --upgrade pip && \
-    pip install --extra-index-url https://download.pytorch.org/whl/cpu \
-    torch==2.2.2+cpu torchaudio==2.2.2+cpu torchvision==0.17.2+cpu && \
     pip install -r requirements.txt
 
 # Copy application files
