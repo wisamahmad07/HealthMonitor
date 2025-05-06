@@ -29,13 +29,13 @@ ENV PATH="/opt/venv/bin:$PATH"
 # Install Python dependencies
 COPY requirements.txt .
 RUN pip install --upgrade pip && \
-    pip install -r requirements.txt
+    pip install -r requirements.txtpip install --no-cache-dir -r requirements.txt
 
 # Copy application files
 COPY . .
 
 # Expose port
-EXPOSE 8000
+EXPOSE 5000
 
 # Run Gunicorn using virtual environment
 CMD ["gunicorn", "--timeout", "6000", "--workers", "1", "--worker-class", "gevent", "--worker-connections", "100", "main:app"]
