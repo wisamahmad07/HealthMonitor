@@ -34,7 +34,6 @@ WORKDIR /app
 # Install Python dependencies
 COPY requirements.txt .
 RUN pip install --upgrade pip
-RUN pip install -r requirements.txt
 
 # Copy the rest of the app
 COPY . .
